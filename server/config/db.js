@@ -17,3 +17,5 @@ async function dbConnection() {
     console.log("Connection failed");
   }
 }
+
+module.exports = { sequelize, dbConnection };

@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const app = require("./app");
+const { dbConnection } = require("./config/db");
 
 process.on("uncaughtException", (err) => {
   console.log(err.message, err.name);
@@ -10,6 +11,7 @@ process.on("uncaughtException", (err) => {
 
 dotenv.config({ path: "../config.env" });
 
+dbConnection();
 const port = process.env.PORT || 3001;
 
 const server = app.listen(port, () => {
