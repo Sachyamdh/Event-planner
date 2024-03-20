@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+dotenv.config({ path: "../config.env" });
 const app = require("./app");
 const { dbConnection } = require("./config/db");
 
@@ -8,8 +9,6 @@ process.on("uncaughtException", (err) => {
   console.log("Unhandles Exception Error; Shutting down server");
   process.exit(1);
 });
-
-dotenv.config({ path: "../config.env" });
 
 dbConnection();
 const port = process.env.PORT || 3001;

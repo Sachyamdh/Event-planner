@@ -14,7 +14,7 @@ async function dbConnection() {
     await sequelize.authenticate();
     console.log("Connection Successfull");
   } catch (error) {
-    console.log("Connection failed");
+    console.log("Connection failed", error.stack);
   }
 }
 
