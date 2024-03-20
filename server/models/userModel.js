@@ -2,10 +2,10 @@ const sql = require("sequelize");
 const { sequelize } = require("../config/db");
 
 class User extends sql.Model {
-//   static associate(models) {
-//     User.belongsTo(models.Events, { foreignKey: "eventId" });
-//     User.hasMany(models.Calendar, { foreignKey: "userId" });
-//   }
+  //   static associate(models) {
+  //     User.belongsTo(models.Events, { foreignKey: "eventId" });
+  //     User.hasMany(models.Calendar, { foreignKey: "userId" });
+  //   }
 }
 
 User.init(
@@ -49,11 +49,24 @@ User.init(
       },
     },
     email: {
-      type: sql.DataTypes.email,
-      require: true,
+      type: sql.DataTypes.STRING,
+      allowNull: false,
       validate: {
         isEmail: {
           msg: "Enter a valid email address",
+        },
+      },
+    },
+    password: {
+      type: sql.DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isAlphanumeric: {
+          msg: "Password must contain alphabet and number",
+        },
+        len: {
+          args: [8],
+          msg: "Password must be 8 characters long",
         },
       },
     },
