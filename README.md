@@ -38,9 +38,8 @@ This is an event planner website where users can create events within their orga
 Open a web browser and navigate to `http://localhost:3000` to access the event planner website.
 
 ### Contributors:
-- [Your Name](https://github.com/your-username)
-- [Contributor 1](https://github.com/contributor1)
-- [Contributor 2](https://github.com/contributor2)
+- [Sachyam Dhungana](https://github.com/Sachyamdh/)
+
 
 ### License:
 This project is licensed under the [MIT License](LICENSE).
