@@ -10,7 +10,6 @@ const signToken = (id) => {
 
 //creating a signUp controller
 const signUp = async (req, res, next) => {
-  console.log(req.body);
   const user = await User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,

@@ -51,7 +51,6 @@ const sendErrorProduction = (err, res) => {
 
 module.exports = async (err, req, res, next) => {
   let { ...error } = err;
-  console.log(error.error.name,error.error.message);
   err.statusCode = error.statusCode || 500;
   err.status = error.status || "error";
   if (process.env.NODE_ENV === "dev") {

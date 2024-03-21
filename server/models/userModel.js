@@ -65,16 +65,6 @@ User.init(
       type: sql.DataTypes.STRING,
       allowNull: false,
       validate: {
-        validator: function (el) {
-          return el === this.password;
-        },
-        msg: "Passwords do not match",
-      },
-    },
-    confirmPassword: {
-      type: sql.DataTypes.STRING,
-      allowNull: true,
-      validate: {
         isAlphanumeric: {
           msg: "Password must contain alphabet and number",
         },
@@ -82,6 +72,17 @@ User.init(
           args: [8],
           msg: "Password must be 8 characters long",
         },
+      },
+    },
+    confirmPassword: {
+      type: sql.DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        validator: function (el) {
+          console.log(el === this.password)
+          return el === this.password;
+        },
+        msg: "Passwords do not match",
       },
     },
   },
