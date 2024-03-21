@@ -1,9 +1,10 @@
 const express = require("express");
-const { route } = require("../app");
+const tryCatch = require("../utils/tryCatch");
 const router = express.Router();
+const { signUp } = require("../controller/authController");
 
 //creating routes for our authentication
-router.route("/signup").post();
+router.route("/signUp").post(tryCatch(signUp));
 router.route("/login").post();
 router.post("/forgorpassword");
 router.patch("/resetPassword/:token");

@@ -1,6 +1,7 @@
 const sql = require("sequelize");
 const { sequelize } = require("../config/db");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 //Establishing relationship of user model with other models
 class User extends sql.Model {
@@ -44,7 +45,7 @@ User.init(
     },
     age: {
       type: sql.DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       validate: {
         isInt: {
           msg: "Enter a number",
@@ -61,6 +62,16 @@ User.init(
       },
     },
     password: {
+      type: sql.DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        validator: function (el) {
+          return el === this.password;
+        },
+        msg: "Passwords do not match",
+      },
+    },
+    confirmPassword: {
       type: sql.DataTypes.STRING,
       allowNull: true,
       validate: {
@@ -81,5 +92,6 @@ User.init(
     timestamps: true,
   }
 );
+// User.beforeCreate(async (password) => {});
 
 module.exports = User;
