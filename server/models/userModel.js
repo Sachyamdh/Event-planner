@@ -1,6 +1,7 @@
 const sql = require("sequelize");
 const { sequelize } = require("../config/db");
 
+//Establishing relationship of user model with other models
 class User extends sql.Model {
   //   static associate(models) {
   //     User.belongsTo(models.Events, { foreignKey: "eventId" });
@@ -8,6 +9,7 @@ class User extends sql.Model {
   //   }
 }
 
+//creating a basic User model for our user table
 User.init(
   {
     id: {

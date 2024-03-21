@@ -1,5 +1,6 @@
 const postGres = require("sequelize");
 
+//authentiacting our credentials
 const sequelize = new postGres.Sequelize({
   dialect: "postgres",
   database: process.env.DB_NAME,
@@ -9,6 +10,7 @@ const sequelize = new postGres.Sequelize({
   port: process.env.DB_PORT,
 });
 
+//initializing connection
 async function dbConnection() {
   try {
     await sequelize.authenticate();
