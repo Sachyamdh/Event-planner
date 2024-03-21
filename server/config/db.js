@@ -9,7 +9,6 @@ const sequelize = new postGres.Sequelize({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
 });
-
 //initializing connection
 async function dbConnection() {
   try {
