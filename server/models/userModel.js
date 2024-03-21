@@ -1,5 +1,6 @@
 const sql = require("sequelize");
 const { sequelize } = require("../config/db");
+const bcrypt = require("bcrypt");
 
 //Establishing relationship of user model with other models
 class User extends sql.Model {
