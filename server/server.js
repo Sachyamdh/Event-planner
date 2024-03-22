@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: "../config.env" });
 const app = require("./app");
-const { dbConnection } = require("./config/db");
+const { dbConnection, sequelize } = require("./config/db");
 
 process.on("uncaughtException", (err) => {
   console.log(err.message, err.name);
@@ -11,6 +11,7 @@ process.on("uncaughtException", (err) => {
 });
 
 dbConnection();
+
 const port = process.env.PORT || 3001;
 
 const server = app.listen(port, () => {

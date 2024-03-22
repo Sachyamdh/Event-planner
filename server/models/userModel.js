@@ -2,17 +2,18 @@ const sql = require("sequelize");
 const { sequelize } = require("../config/db");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-
+const appError = require("../middleware/errorHandler");
 //Establishing relationship of user model with other models
-class User extends sql.Model {
-  //   static associate(models) {
-  //     User.belongsTo(models.Events, { foreignKey: "eventId" });
-  //     User.hasMany(models.Calendar, { foreignKey: "userId" });
-  //   }
-}
+// class User extends sql.Model {
+//   //   static associate(models) {
+//   //     User.belongsTo(models.Events, { foreignKey: "eventId" });
+//   //     User.hasMany(models.Calendar, { foreignKey: "userId" });
+//   //   }
+// }
 
 //creating a basic User model for our user table
-User.init(
+const User = sequelize.define(
+  "user",
   {
     id: {
       type: sql.DataTypes.INTEGER,
@@ -78,21 +79,26 @@ User.init(
       type: sql.DataTypes.STRING,
       allowNull: true,
       validate: {
-        validator: function (el) {
-          console.log(el === this.password)
-          return el === this.password;
+        isMatchingPassword(value) {
+          if (value !== this.password) {
+            throw new appError(
+              "ValidationError",
+              "Passwords do not match",
+              404
+            );
+          }
+          return value;
         },
-        msg: "Passwords do not match",
       },
     },
   },
   {
-    sequelize,
-    modelName: "User",
     tableName: "users",
-    timestamps: true,
+    schema: "events",
   }
 );
+
+User.sync();
 // User.beforeCreate(async (password) => {});
 
 module.exports = User;
