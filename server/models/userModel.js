@@ -56,6 +56,7 @@ const User = sequelize.define(
     email: {
       type: sql.DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         isEmail: {
           msg: "Enter a valid email address",
@@ -98,7 +99,13 @@ const User = sequelize.define(
   }
 );
 
-User.sync();
-// User.beforeCreate(async (password) => {});
+User.beforeCreate(async (user) => {
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  user.password = hashedPassword;
+  user.confirmPassword = undefined;
+});
 
+User.sync().then(() => {
+  console.log("Model synced");
+});
 module.exports = User;
