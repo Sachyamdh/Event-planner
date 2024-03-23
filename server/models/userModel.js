@@ -99,13 +99,21 @@ const User = sequelize.define(
   }
 );
 
+//encrypting the password before the user is created
 User.beforeCreate(async (user) => {
   const hashedPassword = await bcrypt.hash(user.password, 10);
   user.password = hashedPassword;
   user.confirmPassword = undefined;
 });
 
+//comparing the encrypted password before loggin In
+User.prototype.correctPassword = async function (candidatePassword, user) {
+  return bcrypt.compare(candidatePassword, user.password);
+};
+
+//syncing the model
 User.sync().then(() => {
   console.log("Model synced");
 });
+
 module.exports = User;
