@@ -10,6 +10,8 @@ const signToken = (id) => {
   });
 };
 
+// const resetToken =  
+
 //creating a signUp controller
 const signUp = async (req, res, next) => {
   const user = await User.create({
@@ -47,6 +49,16 @@ const logIn = async (req, res) => {
       user,
     },
   });
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req?.body.email;
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new appError("AuthenticationError", "Invalid Email", 404);
+  }
+
+
 };
 
 module.exports = { signUp, logIn };
