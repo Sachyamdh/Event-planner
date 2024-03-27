@@ -1,7 +1,7 @@
 const sql = require("sequelize");
 const { sequelize } = require("../config/db");
 const bcrypt = require("bcrypt");
-const validator = require("validator");
+const crypto = require("crypto");
 const appError = require("../middleware/errorHandler");
 //Establishing relationship of user model with other models
 // class User extends sql.Model {
@@ -92,6 +92,19 @@ const User = sequelize.define(
         },
       },
     },
+    passwordChangedAt: {
+      type: sql.DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Date.now(),
+    },
+    passwordResetToken: {
+      type: sql.DataTypes.STRING,
+      allowNull: true,
+    },
+    passwordResetExpire: {
+      type: sql.DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: "users",
@@ -109,6 +122,17 @@ User.beforeCreate(async (user) => {
 //comparing the encrypted password before loggin In
 User.prototype.correctPassword = async function (candidatePassword, user) {
   return bcrypt.compare(candidatePassword, user.password);
+};
+
+User.prototype.forgetPassowrd = async function (user) {
+  const token = crypto.randomBytes(32).toString("hex");
+  user.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  user.passwordResetExpire = Date.now() + 5 * 60 * 1000;
+
+  return token;
 };
 
 //syncing the model

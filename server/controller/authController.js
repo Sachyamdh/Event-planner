@@ -10,7 +10,8 @@ const signToken = (id) => {
   });
 };
 
-// const resetToken =  
+//creating a reset token
+// const resetToken =
 
 //creating a signUp controller
 const signUp = async (req, res, next) => {
@@ -58,7 +59,25 @@ const forgotPassword = async (req, res) => {
     throw new appError("AuthenticationError", "Invalid Email", 404);
   }
 
+  const resetToken = user.forgetPassword(user);
+  const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
 
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nToken valid for 5minutes only\n If you didn't forget your password, please ignore this email.`;
+
+  try {
+  } catch (error) {
+    (user.passwordResetToken = undefined)(
+      (user.passwordResetExpire = undefined)
+    );
+    await user.save({ validate: false });
+    return next(
+      new appError(
+        error,
+        "There was an error sending the password reset token,Try again later",
+        500
+      )
+    );
+  }
 };
 
-module.exports = { signUp, logIn };
+module.exports = { signUp, logIn, forgotPassword };
