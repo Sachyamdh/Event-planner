@@ -124,19 +124,20 @@ User.prototype.correctPassword = async function (candidatePassword, user) {
   return bcrypt.compare(candidatePassword, user.password);
 };
 
-User.prototype.forgetPassowrd = async function (user) {
+User.prototype.forgetPassword = async function (user) {
   const token = crypto.randomBytes(32).toString("hex");
   user.passwordResetToken = crypto
     .createHash("sha256")
-    .update(resetToken)
+    .update(token)
     .digest("hex");
-  user.passwordResetExpire = Date.now() + 5 * 60 * 1000;
 
+  //this is 5 minutes. For users who are viewing i converted it into milliseconds
+  user.passwordResetExpire = Date.now() + 5 * 60 * 1000;
   return token;
 };
 
 //syncing the model
-User.sync().then(() => {
+User.sync({ alter: true }).then(() => {
   console.log("Model synced");
 });
 

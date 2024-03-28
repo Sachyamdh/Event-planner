@@ -17,13 +17,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-console.log(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  process.env.REDIRECT_URL
-);
-
-async function sendMail(userEmail, token) {
+async function sendMail(userEmail, message) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
     console.log(accessToken.token);
@@ -45,8 +39,8 @@ async function sendMail(userEmail, token) {
     const mailOptions = {
       from: `Event-Planner ${process.env.USER}`,
       to: userEmail,
-      subject: "User API",
-      text: "This is test",
+      subject: "Reset Password",
+      text: message,
     };
     const result = await transport.sendMail(mailOptions);
     return result;

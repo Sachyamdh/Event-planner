@@ -1,7 +1,10 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const appError = require("../middleware/errorHandler");
+const sendMail = require("../middleware/mailer");
+const { Op } = require("sequelize");
+const { gmail } = require("googleapis/build/src/apis/gmail");
 
 //creating a json web token
 const signToken = (id) => {
@@ -9,9 +12,6 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRY,
   });
 };
-
-//creating a reset token
-// const resetToken =
 
 //creating a signUp controller
 const signUp = async (req, res, next) => {
@@ -33,12 +33,14 @@ const signUp = async (req, res, next) => {
   });
 };
 
+//creatign a login
 const logIn = async (req, res) => {
   const { email, password } = req?.body;
   if (!email || !password) {
     throw new appError("AuthenticationError", "Email or Password empty", 404);
   }
   const user = await User.findOne({ where: { email } });
+  //compares with the encrypted hashed password in the database. correct password is a prototype
   if (!user || !user.correctPassword(password, user)) {
     throw new appError("AuthenticationError", "Invalid email or password", 404);
   }
@@ -52,23 +54,25 @@ const logIn = async (req, res) => {
   });
 };
 
+//creating a forgot password for the system
 const forgotPassword = async (req, res) => {
-  const { email } = req?.body.email;
+  const email = req?.body.email;
   const user = await User.findOne({ where: { email } });
   if (!user) {
     throw new appError("AuthenticationError", "Invalid Email", 404);
   }
-
-  const resetToken = user.forgetPassword(user);
-  const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
-
+  // create a forgot password token using a prototype
+  const resetToken = await user.forgetPassword(user);
+  // creates a reset URL to send
+  const resetURL = `${req.protocol}://${req.get("host")}/authenticate/user/forgotpassword/${resetToken}`;
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nToken valid for 5minutes only\n If you didn't forget your password, please ignore this email.`;
-
   try {
+    //sendign user the email to reset his password
+    await sendMail(user.email, message);
+    await user.save();
   } catch (error) {
-    (user.passwordResetToken = undefined)(
-      (user.passwordResetExpire = undefined)
-    );
+    user.passwordResetToken = undefined;
+    user.passwordResetExpire = undefined;
     await user.save({ validate: false });
     return next(
       new appError(
@@ -78,6 +82,50 @@ const forgotPassword = async (req, res) => {
       )
     );
   }
+  res
+    .status(200)
+    .json({ status: "sucess", message: `Reset email sent at ${email}` });
 };
 
-module.exports = { signUp, logIn, forgotPassword };
+//reseting the password
+const resetPassword = async (req, res) => {
+  const hashed = crypto
+    .createHash("sha256")
+    .update(req?.params.token)
+    .digest("hex");
+  //checking if the token is valid and not expired
+  const user = await User.findOne({
+    where: {
+      passwordResetToken: hashed,
+      passwordResetExpire: { [Op.gt]: Date.now() },
+    },
+  });
+  //throwing error if the token has expired
+  if (!user) {
+    throw new appError(
+      "ValidationError",
+      "The token you provided is invalid",
+      400
+    );
+  }
+
+  user.password = req?.body.password;
+  user.confirmPassword = req?.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpire = undefined;
+  user.passwordChangedAt = Date.now();
+
+  await user.save();
+
+  const token = signToken(user.id);
+  res.status(200).json({
+    status: "success",
+    token,
+    message: "Password changed successfully",
+    data: {
+      user,
+    },
+  });
+};
+
+module.exports = { signUp, logIn, forgotPassword, resetPassword };

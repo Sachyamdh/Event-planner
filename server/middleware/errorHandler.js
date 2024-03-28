@@ -3,7 +3,6 @@ class appError extends Error {
     super(message);
     this.statusCode = statusCode;
     this.error = err;
-    this.message = message;
     this.status = `${statusCode}`.startsWith("4")
       ? "operational error"
       : "server error";
